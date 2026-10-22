@@ -21,7 +21,7 @@ pre{white-space:pre-wrap;background:#f3f3f3;padding:12px;border-radius:8px}.foot
 <div class="card"><div id="loading">Loading the agent…</div>
 <div class="presets"><b>Try a test case:</b><br>
 <button class="alt" data-p="t1">Ruth (happy path)</button><button class="alt" data-p="t2">"Don't want to bother anyone"</button><button class="alt" data-p="t6">"Text my friends for me"</button><button class="alt" data-p="t7">"No one would notice"</button><button class="alt" data-p="t8">Medication question</button></div>
-<label>Your first name</label><input id="name" value="Ruth">
+<p style="background:#fff7e6;padding:8px 12px;border-radius:8px"><b>Demo:</b> Ruth is a made-up persona. Please don't enter real health information.</p><label>Your first name</label><input id="name" value="Ruth">
 <label>Where you live</label><input id="area" value="Boston">
 <label>What could come up</label><div class="needs">
 <label><input type="checkbox" value="ride_home" checked>Ride home after a procedure</label>
@@ -55,7 +55,7 @@ go.onclick=run;
 function run(){if(!py)return;
  const needs=[...document.querySelectorAll('.needs input:checked')].map(i=>i.value);
  const hl=helpersEl().map(l=>{const [n,...t]=l.split(/\s+-\s+/);return {name:n.trim(),task:(t.join(' - ')||'Help with one small thing').trim(),need:'pet_care'}});
- py.globals.set('ARGS',JSON.stringify({name:name.value||'Friend',area:area.value||'Boston',needs,helpers:hl,msg:msg.value}));
+ py.globals.set('ARGS',JSON.stringify({name:document.getElementById('name').value||'Friend',area:area.value||'Boston',needs,helpers:hl,msg:msg.value}));
  const res=py.runPython(`
 import json
 from agent.loop import User, run
