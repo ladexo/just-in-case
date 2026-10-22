@@ -1,0 +1,149 @@
+{
+ "verified_on": "2026-10-21",
+ "note": "Curated demo list for Greater Boston. Phone numbers were copied from each official site on verified_on; null means not confirmed, so the agent must show the website and 'call to confirm'.",
+ "services": [
+  {
+   "id": "fw-escort",
+   "name": "FriendshipWorks Medical Escort",
+   "need": [
+    "ride_home"
+   ],
+   "area": "Greater Boston",
+   "cost": "free",
+   "phone": "617-482-1510",
+   "url": "https://fw4elders.org",
+   "waitlist": "unknown",
+   "escort_rule_check": true
+  },
+  {
+   "id": "boston-age-strong",
+   "name": "City of Boston Age Strong Commission",
+   "need": [
+    "general_support",
+    "information",
+    "ride_home"
+   ],
+   "area": "Boston",
+   "cost": "free",
+   "phone": "617-635-4366",
+   "url": "https://www.boston.gov/departments/age-strong-commission",
+   "waitlist": "unknown"
+  },
+  {
+   "id": "boston-shuttle",
+   "name": "Age Strong Shuttle (medical appointment rides)",
+   "need": [
+    "ride_home"
+   ],
+   "area": "Boston",
+   "cost": "free",
+   "phone": "617-635-4366",
+   "url": "https://www.boston.gov/departments/age-strong-commission/age-strong-shuttle",
+   "waitlist": "unknown",
+   "escort_rule_check": true
+  },
+  {
+   "id": "mbta-ride",
+   "name": "MBTA The RIDE (paratransit)",
+   "need": [
+    "ride_home"
+   ],
+   "area": "MBTA service area",
+   "cost": "low",
+   "phone": "617-222-3200",
+   "url": "https://www.mbta.com/accessibility/the-ride",
+   "waitlist": "eligibility application required",
+   "escort_rule_check": true
+  },
+  {
+   "id": "ethos",
+   "name": "Ethos (elder services, Boston)",
+   "need": [
+    "general_support",
+    "home_support",
+    "meals"
+   ],
+   "area": "Jamaica Plain, Roslindale, West Roxbury, Hyde Park, Mattapan",
+   "cost": "free_or_sliding",
+   "phone": null,
+   "url": "https://www.ethocare.org",
+   "waitlist": "unknown"
+  },
+  {
+   "id": "mass211",
+   "name": "Mass 211",
+   "need": [
+    "information",
+    "uncovered_fallback"
+   ],
+   "area": "Massachusetts",
+   "cost": "free",
+   "phone": "211 or 877-211-6277",
+   "url": "https://mass211.org",
+   "waitlist": "none"
+  },
+  {
+   "id": "age-info",
+   "name": "MassOptions / 1-800-AGE-INFO",
+   "need": [
+    "information",
+    "uncovered_fallback"
+   ],
+   "area": "Massachusetts",
+   "cost": "free",
+   "phone": "1-800-243-4636",
+   "url": "https://www.mass.gov/info-details/find-your-local-council-on-aging",
+   "waitlist": "none"
+  },
+  {
+   "id": "mass-coa",
+   "name": "Local Council on Aging (directory)",
+   "need": [
+    "information",
+    "ride_home",
+    "uncovered_fallback"
+   ],
+   "area": "Massachusetts",
+   "cost": "free",
+   "phone": null,
+   "url": "https://www.mass.gov/info-details/find-your-local-council-on-aging",
+   "waitlist": "varies"
+  },
+  {
+   "id": "eversource-help",
+   "name": "Eversource payment and medical protection help",
+   "need": [
+    "power_outage"
+   ],
+   "area": "Eversource customers",
+   "cost": "free",
+   "phone": null,
+   "url": "https://www.eversource.com/content/residential/account-billing/manage-bill/payment-assistance",
+   "waitlist": "none"
+  },
+  {
+   "id": "mspca",
+   "name": "MSPCA-Angell",
+   "need": [
+    "pet_care"
+   ],
+   "area": "Massachusetts",
+   "cost": "varies",
+   "phone": null,
+   "url": "https://www.mspca.org",
+   "waitlist": "unknown"
+  },
+  {
+   "id": "arl",
+   "name": "Animal Rescue League of Boston",
+   "need": [
+    "pet_care"
+   ],
+   "area": "Massachusetts",
+   "cost": "varies",
+   "phone": null,
+   "url": "https://www.arl.org",
+   "waitlist": "unknown"
+  }
+ ]
+}

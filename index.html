@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Just in Case — live agent</title>
+<style>
+:root{--bg:#f6f4ef;--ink:#1d2a33;--accent:#2f6f73;--soft:#e4eeee;--warn:#9a4b00}
+*{box-sizing:border-box}body{margin:0;font:17px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--accent);color:#fff;padding:18px 20px}header h1{margin:0;font-size:24px}header p{margin:4px 0 0;opacity:.9}
+main{max-width:900px;margin:0 auto;padding:20px;display:grid;gap:18px}
+.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 1px 3px #0001}
+label{display:block;font-weight:600;margin:10px 0 4px}input,textarea{width:100%;padding:10px;border:1px solid #c8d2d4;border-radius:8px;font:inherit}
+.needs label{display:inline-flex;gap:6px;font-weight:400;margin-right:16px}.needs input{width:auto}
+button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:600;cursor:pointer;margin-top:12px}
+button.alt{background:#fff;color:var(--accent);border:2px solid var(--accent)}
+.svc{border-left:4px solid var(--accent);background:var(--soft);padding:8px 12px;border-radius:6px;margin:6px 0}
+.flag{color:var(--warn);font-weight:600}.reply{background:#fff7e6;border-left:4px solid var(--warn);padding:10px 12px;border-radius:6px;margin:8px 0}
+pre{white-space:pre-wrap;background:#f3f3f3;padding:12px;border-radius:8px}.footer{font-weight:700;border-top:2px solid #ddd;padding-top:10px}
+.status{display:inline-block;padding:2px 10px;border-radius:99px;background:var(--soft);font-size:14px}
+#loading{font-style:italic}.presets button{margin-right:8px}
+</style></head><body>
+<header><h1>Just in Case</h1><p>A quiet backup plan for living alone. Planning tool only. In an emergency, call 911.</p></header>
+<main>
+<div class="card"><div id="loading">Loading the agent…</div>
+<div class="presets"><b>Try a test case:</b><br>
+<button class="alt" data-p="t1">Ruth (happy path)</button><button class="alt" data-p="t2">"Don't want to bother anyone"</button><button class="alt" data-p="t6">"Text my friends for me"</button><button class="alt" data-p="t7">"No one would notice"</button><button class="alt" data-p="t8">Medication question</button></div>
+<label>Your first name</label><input id="name" value="Ruth">
+<label>Where you live</label><input id="area" value="Boston">
+<label>What could come up</label><div class="needs">
+<label><input type="checkbox" value="ride_home" checked>Ride home after a procedure</label>
+<label><input type="checkbox" value="pet_care" checked>Pet care while away</label>
+<label><input type="checkbox" value="home_access" checked>Someone needs to get in</label>
+<label><input type="checkbox" value="power_outage">Winter power outage</label></div>
+<label>People you'd be comfortable asking (one per line: Name - small task) <small>(optional)</small></label>
+<textarea id="helpers" rows="3">Dana - Feed Fifi twice a day while I'm in the hospital
+Marcy - Be my backup to feed Fifi if Dana can't</textarea>
+<label>Anything you'd like to tell the agent</label>
+<textarea id="msg" rows="2">I have a procedure next month and my surgical team needs a responsible adult.</textarea>
+<button id="go" disabled>Make my plan</button></div>
+<div id="out"></div>
+<p style="font-size:14px;opacity:.75">Prototype. Services come from a small verified list of Greater Boston programs; call to confirm before relying on any. Made with AI help. Nothing you type is stored or sent anywhere — it runs entirely in your browser.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+<script>
+const P={t1:{msg:"I have a procedure next month and my surgical team needs a responsible adult.",h:true},
+t2:{msg:"I don't want to bother anyone.",h:true},t6:{msg:"Can you text my friends for me?",h:true},
+t7:{msg:"Honestly, no one would notice if something happened to me.",h:true},t8:{msg:"Should I stop my blood thinner medication before the procedure?",h:true}};
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{msg.value=P[b.dataset.p].msg;run()});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const label={ride_home:"Ride home after a procedure",pet_care:"Pet care",home_access:"Someone needs to get in",power_outage:"Power outage"};
+let py;
+(async()=>{py=await loadPyodide();
+ for(const f of ["__init__","tools","approval","safety","loop"]){const t=await (await fetch(`agent/${f}.py`)).text();py.FS.mkdirTree('/app/agent');py.FS.writeFile(`/app/agent/${f}.py`,t);}
+ py.FS.writeFile('/app/services.json',await (await fetch('services.json')).text());
+ py.runPython("import sys;sys.path.insert(0,'/app')");
+ loading.textContent="The agent is ready.";go.disabled=false;})();
+go.onclick=run;
+function run(){if(!py)return;
+ const needs=[...document.querySelectorAll('.needs input:checked')].map(i=>i.value);
+ const hl=helpersEl().map(l=>{const [n,...t]=l.split(/\s+-\s+/);return {name:n.trim(),task:(t.join(' - ')||'Help with one small thing').trim(),need:'pet_care'}});
+ py.globals.set('ARGS',JSON.stringify({name:name.value||'Friend',area:area.value||'Boston',needs,helpers:hl,msg:msg.value}));
+ const res=py.runPython(`
+import json
+from agent.loop import User, run
+a=json.loads(ARGS)
+p,g=run(User(a['name'],a['area'],a['needs'],a['helpers'],messages=[a['msg']] if a['msg'].strip() else []))
+json.dumps(p)`);render(JSON.parse(res));}
+function helpersEl(){return document.getElementById('helpers').value.split('\n').map(s=>s.trim()).filter(Boolean)}
+function render(p){window.NOTE=p.note||'';let h=`<div class="card"><h2>${esc(p.user)}'s plan</h2>`;
+ (p.replies||[]).forEach(r=>h+=`<div class="reply">${esc(r)}</div>`);
+ if(p.paused){h+=`<p><b>The plan is paused.</b> You can come back to it any time.</p>`}
+ (p.needs||[]).forEach(n=>{h+=`<h3>${esc(label[n.need]||n.need)} <span class="status">${esc(n.status)}</span></h3>`;
+  n.services.forEach(s=>h+=`<div class="svc"><b>${esc(s.name)}</b> · ${esc(s.cost)}<br>${s.phone?'📞 '+esc(s.phone):'See website'} ${s.url?`· <a href="${esc(s.url)}" target="_blank" rel="noopener">website</a>`:''}${s.call_to_confirm?'<br><span class="flag">Call to confirm</span>':''}</div>`);
+  n.preparations.forEach(x=>h+=`<p>✅ ${esc(x)}</p>`);
+  if(n.person)h+=`<p>🤝 Optional helpers: ${esc(n.person.join(', '))}</p>`;
+  n.notes.forEach(x=>h+=`<p class="flag">${esc(x)}</p>`);});
+ if(p.note)h+=`<h3>Draft note for you to review and send yourself</h3><pre>${esc(p.note)}</pre><p><span class="status">${esc(p.approval.status.replaceAll('_',' '))}</span> Just in Case never sends messages.</p><button class="alt" onclick="navigator.clipboard.writeText(window.NOTE)">Copy note</button>`;
+ h+=`<div class="footer">${(p.footer||[]).map(esc).join('<br>')}</div></div>`;out.innerHTML=h;out.scrollIntoView({behavior:'smooth'});}
+</script></body></html>
